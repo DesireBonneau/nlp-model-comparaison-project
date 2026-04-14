@@ -21,8 +21,8 @@ val_texts, test_texts, val_labels, test_labels = train_test_split(
     temp_texts, temp_labels, test_size=0.5, random_state=42, stratify=temp_labels
 )
 
-# Expected: Train: 40000, Val: 5000, Test: 5000
 print(f"Train: {len(train_texts)}, Val: {len(val_texts)}, Test: {len(test_texts)}")
+# Expected: Train: 40000, Val: 5000, Test: 5000
 
 def clean_text(text):
     text = re.sub(r'<br\s*/?>', ' ', text)      # IMDb has HTML <br> tags
