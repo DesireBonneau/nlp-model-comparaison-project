@@ -5,6 +5,16 @@ import numpy as np
 from tqdm import tqdm
 import re
 
+# --- Debug mode: set to True to run on a small subset for quick testing ---
+DEBUG = False
+DEBUG_SAMPLES = 50  # Number of samples per split in debug mode
+
+if DEBUG:
+    train_texts = train_texts[:DEBUG_SAMPLES]
+    val_texts = val_texts[:DEBUG_SAMPLES]
+    test_texts = test_texts[:DEBUG_SAMPLES]
+    print(f"[DEBUG MODE] Using only {DEBUG_SAMPLES} samples per split")
+
 model_name = "bert-base-uncased"
 # Applies BERT's tokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -52,7 +62,6 @@ def extract_embeddings(texts, tokenizer, model, device, batch_size=32, max_lengt
     # Each batch's embeddings are moved back to CPU as numpy arrays and stacked into one huge array
     return np.concatenate(all_embeddings, axis=0)
 
-
 # For BERT, no need for full cleaning of the splits (only remove the <br> tags)
 train_texts_bert = [re.sub(r'<br\s*/?>', ' ', t).strip() for t in train_texts]
 val_texts_bert = [re.sub(r'<br\s*/?>', ' ', t).strip() for t in val_texts]
@@ -66,9 +75,12 @@ print("Extracting test embeddings...")
 X_test_emb = extract_embeddings(test_texts_bert, tokenizer, model, device)
 
 # Making sure to save so that we don't have to recompute the embeddings
-np.save("embeddings/train_embeddings.npy", X_train_emb)
-np.save("embeddings/val_embeddings.npy", X_val_emb)
-np.save("embeddings/test_embeddings.npy", X_test_emb)
+import os
+os.makedirs("embeddings", exist_ok=True)
+suffix = "_debug" if DEBUG else ""
+np.save(f"embeddings/train_embeddings{suffix}.npy", X_train_emb)
+np.save(f"embeddings/val_embeddings{suffix}.npy", X_val_emb)
+np.save(f"embeddings/test_embeddings{suffix}.npy", X_test_emb)
 
 print(f"Shapes: train={X_train_emb.shape}, val={X_val_emb.shape}, test={X_test_emb.shape}")
 # Expected: (40000, 768), (5000, 768), (5000, 768)
