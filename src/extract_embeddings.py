@@ -1,16 +1,24 @@
-from preprocess import train_texts, val_texts, test_texts
+import os
+os.environ["USE_TF"] = "0"
+
+import numpy as np
 import torch
 from transformers import AutoTokenizer, AutoModel
-import numpy as np
-from tqdm import tqdm
-import re
+from preprocess import train_texts, val_texts, test_texts
+
+os.makedirs("embeddings", exist_ok=True)
 
 model_name = "bert-base-uncased"
-# Applies BERT's tokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModel.from_pretrained(model_name)
-# This freezes the model so no dropout layers and no gradient tracking
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
 model.eval()
+
+
+from tqdm import tqdm
+import re
 
 # Runs on GPU if available, otherwise uses CPU (slower)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

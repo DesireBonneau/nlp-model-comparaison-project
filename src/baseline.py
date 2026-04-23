@@ -40,4 +40,4 @@ perc_train_time = time.time() - start
 val_preds_perc = perceptron_baseline.predict(X_val_tfidf)
 print(f"Perceptron Baseline Accuracy: {accuracy_score(val_labels, val_preds_perc):.4f}")
 print(f"Training time: {perc_train_time:.2f}s")
-print(classification_report(val_labels, val_preds_lr))
+print(classification_report(val_labels, val_preds_perc))
